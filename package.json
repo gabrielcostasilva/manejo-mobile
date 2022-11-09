@@ -7,8 +7,10 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@aws-amplify/ui-vue": "^2.4.26",
     "@ionic/vue": "^6.3.4",
     "@ionic/vue-router": "^6.3.4",
+    "aws-amplify": "^4.3.43",
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3"
