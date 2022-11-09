@@ -20,14 +20,22 @@ import '@ionic/vue/css/text-transformation.css'
 import '@ionic/vue/css/flex-utils.css'
 import '@ionic/vue/css/display.css'
 
-import "@aws-amplify/ui-vue/styles.css";
-import { Amplify, Auth } from 'aws-amplify'
+import '@aws-amplify/ui-vue/styles.css'
+import { Amplify, Auth, API } from 'aws-amplify'
 
 Amplify.configure({
   Auth: {
     region: process.env.VUE_APP_REGION,
     userPoolId: process.env.VUE_APP_USER_POOL_ID,
     userPoolWebClientId: process.env.VUE_APP_USER_POOL_WEB_CLIENT_ID,
+  },
+  API: {
+    aws_appsync_graphqlEndpoint:
+      process.env.VUE_APP_AWS_APPSYNC_GRAPHQL_ENDPOINT,
+    aws_appsync_region: process.env.VUE_APP_AWS_APPSYNC_REGION,
+    aws_appsync_authenticationType:
+      process.env.VUE_APP_AWS_APPSYNC_AUTHENTICATION_TYPE,
+    aws_appsync_apiKey: process.env.VUE_APP_AWS_APPSYNC_API_KEY,
   },
 })
 

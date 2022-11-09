@@ -7,8 +7,8 @@
     </ion-header>
     <ion-content class="ion-padding">
       <ion-list>
-        <ion-item v-for="ur in urs" :key="ur">
-          <ion-label>{{ ur }}</ion-label>
+        <ion-item v-for="ur in urs" :key="ur.id">
+          <ion-label>{{ ur.nome }}</ion-label>
         </ion-item>
       </ion-list>
     </ion-content>
@@ -24,14 +24,22 @@ import {
   IonContent,
   IonList,
   IonItem,
-  IonLabel
+  IonLabel,
 } from '@ionic/vue'
 
-const urs = [
-  'Pokémon Yellow',
-  'Mega Man X',
-  'The Legend of Zelda',
-  'Pac-Man',
-  'Super Mario World',
-]
+import { API, graphqlOperation } from 'aws-amplify'
+import { ref } from 'vue'
+
+const ListEvents = `query {
+  listarTodas {
+    id
+    nome
+  }
+}`
+
+const urs = ref([])
+
+API.graphql(graphqlOperation(ListEvents))
+  .then((result) => urs.value = result.data.listarTodas)
+  .catch((err) => console.err('oops', err))
 </script>
