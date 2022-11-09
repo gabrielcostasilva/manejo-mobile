@@ -12,6 +12,7 @@
     "@ionic/vue-router": "^6.3.4",
     "aws-amplify": "^4.3.43",
     "core-js": "^3.8.3",
+    "localbase": "^0.7.5",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3"
   },

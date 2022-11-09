@@ -30,6 +30,9 @@ import {
 import { API, graphqlOperation } from 'aws-amplify'
 import { ref } from 'vue'
 
+import Localbase from 'localbase'
+const db = new Localbase('manejo')
+
 const ListEvents = `query {
   listarTodas {
     id
@@ -40,6 +43,13 @@ const ListEvents = `query {
 const urs = ref([])
 
 API.graphql(graphqlOperation(ListEvents))
-  .then((result) => urs.value = result.data.listarTodas)
-  .catch((err) => console.err('oops', err))
+  .then((result) => {
+    db.collection('urs')
+      .set(result.data.listarTodas)
+      .then((collection) => urs.value = collection.data)
+  })
+  .catch((err) => {
+    db.collection('urs').get().then(results => urs.value = results)
+    console.error(err)
+  })
 </script>
