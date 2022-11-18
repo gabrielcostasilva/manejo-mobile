@@ -8,7 +8,7 @@
     <ion-content class="ion-padding">
       <ion-list>
         <ion-item v-for="ur in urs" :key="ur.id">
-          <ion-label>{{ ur.nome }}</ion-label>
+          <ion-label>{{ ur.name }}</ion-label>
         </ion-item>
       </ion-list>
     </ion-content>
@@ -27,29 +27,15 @@ import {
   IonLabel,
 } from '@ionic/vue'
 
-import { API, graphqlOperation } from 'aws-amplify'
 import { ref } from 'vue'
 
 import Localbase from 'localbase'
 const db = new Localbase('manejo')
 
-const ListEvents = `query {
-  listarTodas {
-    id
-    nome
-  }
-}`
-
 const urs = ref([])
 
-API.graphql(graphqlOperation(ListEvents))
-  .then((result) => {
-    db.collection('urs')
-      .set(result.data.listarTodas)
-      .then((collection) => urs.value = collection.data)
-  })
-  .catch((err) => {
-    db.collection('urs').get().then(results => urs.value = results)
-    console.error(err)
-  })
+db.collection('urs')
+  .get()
+  .then((results) => (urs.value = results))
+
 </script>
