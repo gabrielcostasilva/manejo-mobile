@@ -22,6 +22,7 @@ import '@ionic/vue/css/display.css'
 
 import '@aws-amplify/ui-vue/styles.css'
 import { Amplify, Auth, API } from 'aws-amplify'
+import './registerServiceWorker'
 
 Amplify.configure({
   Auth: {
