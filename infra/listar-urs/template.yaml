@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  ListarURs
+
+  Retrieves UR list from manejo DB.
+
+Parameters:
+  ManejoAppSubnetId:
+    Type: String
+  ManejoAppSecurityGroupId:
+    Type: String
+
+Resources:
+  ListarURs:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/
+      Handler: ListarURs.lambda_handler
+      Runtime: python3.9
+      Timeout: 15
+      Architectures:
+        - arm64
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref ManejoAppSecurityGroupId
+        SubnetIds:
+          - !Ref ManejoAppSubnetId
