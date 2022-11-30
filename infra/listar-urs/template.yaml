@@ -10,6 +10,12 @@ Parameters:
     Type: String
   ManejoAppSecurityGroupId:
     Type: String
+  ManejoDBHost:
+    Type: String
+  ManejoDBPwd: 
+    Type: String
+  ManejoDBUser: 
+    Type: String
 
 Resources:
   ListarURs:
@@ -19,6 +25,11 @@ Resources:
       Handler: ListarURs.lambda_handler
       Runtime: python3.9
       Timeout: 15
+      Environment:
+        Variables:
+          MANEJO_DB_HOST: !Ref ManejoDBHost
+          MANEJO_DB_USER: !Ref ManejoDBUser
+          MANEJO_DB_PWD: !Ref ManejoDBPwd
       Architectures:
         - arm64
       VpcConfig:
