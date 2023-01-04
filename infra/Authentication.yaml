@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: 'Creates the authentication mechanism used for manejo.mobile.'
+
+Parameters:
+  EmailVerificationMessage: 
+    Description: 'The confirmation message for a user sign-up'
+    Type: String
+    MinLength: 20
+    MaxLength: 200
+    Default: 'Para validar seu acesso ao manejo.app use o código: {####}.'
+
+  EmailVerificationSubject:
+    Description: 'The subject of a confirmation message for a user sign-up'
+    Type: String
+    MinLength: 5
+    MaxLength: 50
+    Default: 'Acesso ao manejo.mobile ...'
+
+  EmailMessage:
+    Description: 'The message for inviting a user to sign-up'
+    Type: String
+    MinLength: 20
+    MaxLength: 200
+    Default: 'Esse é um convite para usar o manejo.mobile. Para acessar, use {username} como usuário e {####} como senha.'
+
+  EmailSubject:
+    Description: 'The subject of an invitation message for sign-up'
+    Type: String
+    MinLength: 5
+    MaxLength: 50
+    Default: 'Dados para acesso ao manejo.mobile ...'
+
+  EmailConfigurationFrom:
+    Description: 'The email source for every message by from Cognito'
+    Type: String
+    Default: 'no-reply@mensagens.manejo.app'
+
+  EmailConfigurationReply:
+    Description: 'The reply email for every message sent by Cognito'
+    Type: String
+    Default: 'no-reply@mensagens.manejo.app'
+
+  ManejoSESIdentityDomain:
+    Description: 'The identity domain for sending messages'
+    Type: String
+    Default: 'mensagens.manejo.app'
+
+Resources:
+
+  ManejoSESIdentity:
+    Type: AWS::SES::EmailIdentity
+    Properties: 
+      EmailIdentity: !Ref ManejoSESIdentityDomain
+
+  ManejoUserPool:
+    Type: 'AWS::Cognito::UserPool'
+    Properties:
+      UserPoolName: 'ManejoUserPool'
+      UsernameAttributes:
+        - 'email'
+      AutoVerifiedAttributes:
+        - 'email'
+      Schema:
+        - Name: 'name'
+          AttributeDataType: 'String'
+          Required: True
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: 'verified_email'
+            Priority: 1
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: False
+        InviteMessageTemplate:
+          EmailMessage: !Ref EmailMessage
+          EmailSubject: !Ref EmailSubject
+      EmailConfiguration:
+        EmailSendingAccount: 'DEVELOPER'
+        SourceArn: !Sub 
+          - 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/${SESIdentity}'
+          - SESIdentity: !Ref ManejoSESIdentity
+        From: !Ref EmailConfigurationFrom
+        ReplyToEmailAddress: !Ref EmailConfigurationReply
+      EmailVerificationMessage: !Ref EmailVerificationMessage
+      EmailVerificationSubject: !Ref EmailVerificationSubject
+      MfaConfiguration: 'OFF'
+      Policies:
+        PasswordPolicy:
+          TemporaryPasswordValidityDays: 180
+          RequireUppercase: False
+          RequireSymbols: False
+          RequireNumbers: True
+          RequireLowercase: False
+          MinimumLength: 6
+      UserPoolTags: 
+        Name: !Sub 'manejo-user-pool-${AWS::Region}'
+
+  SENARManejoUserPoolGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties: 
+      GroupName: SENAR
+      UserPoolId: !Ref ManejoUserPool
+
+  IDRManejoUserPoolGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties: 
+      GroupName: IDR
+      UserPoolId: !Ref ManejoUserPool
+
+  ManejoMobileClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties: 
+      ClientName: 'ManejoMobileClient'
+      UserPoolId: !Ref ManejoUserPool
+
+  ManejoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties: 
+      UserPoolId: !Ref ManejoUserPool
+      Domain: 'manejoapp'
+
+Outputs:
+
+  ManejoUserPoolExternalRef:
+    Description: 'ID for manejo user pool'
+    Value: !Ref ManejoUserPool
+    Export:
+      Name: 'ManejoUserPoolID'
+
+  ManejoMobileClientExternalRef:
+    Description: 'ID for manejo.mobile user pool client'
+    Value: !Ref ManejoMobileClient
+    Export:
+      Name: 'ManejoMobileClientID'
+
